@@ -20,6 +20,7 @@ impl ProviderAgent {
                 let agent = client
                     .agent(&llm_config.model)
                     .preamble(&llm_config.system_instruction)
+                    .temperature(llm_config.temperature)
                     .build();
 
                 Ok(ProviderAgent::Ollama(agent))

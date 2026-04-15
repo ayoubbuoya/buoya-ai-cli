@@ -27,4 +27,18 @@ pub struct LLMConfig {
     /// Optional system instruction preamble for the agent.
     #[serde(default)]
     pub system_instruction: String,
+
+    /// Temperature setting for the LLM (e.g., 0.7)
+    pub temperature: f64,
+
+    /// think mode
+    pub think_effort: LLMThinkEffort,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub enum LLMThinkEffort {
+    None,
+    Low,
+    Medium,
+    High,
 }

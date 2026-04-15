@@ -3,7 +3,7 @@ mod llm;
 
 use anyhow::Result;
 
-use crate::config::LLMConfig;
+use crate::config::{LLMConfig, LLMThinkEffort};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -15,6 +15,8 @@ async fn main() -> Result<()> {
         api_base_url: "http://localhost:11434".to_string(),
         model: "qwen3.5:0.8b ".to_string(),
         system_instruction: "You are a helpful assistant.".to_string(),
+        temperature: 0.8,
+        think_effort: LLMThinkEffort::None,
     };
 
     let agent = llm::agent::LLMAgent::new(config)?;
