@@ -32,13 +32,5 @@ pub struct LLMConfig {
     pub temperature: f64,
 
     /// think mode
-    pub think_effort: LLMThinkEffort,
-}
-
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub enum LLMThinkEffort {
-    None,
-    Low,
-    Medium,
-    High,
+    pub think: bool,
 }
