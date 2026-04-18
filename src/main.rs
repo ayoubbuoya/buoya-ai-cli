@@ -1,5 +1,6 @@
 mod config;
 mod llm;
+mod types;
 
 use anyhow::Result;
 
