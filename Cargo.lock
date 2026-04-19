@@ -105,8 +105,10 @@ dependencies = [
  "rig-core",
  "serde",
  "serde_json",
+ "thiserror 2.0.18",
  "tokio",
  "toml",
+ "walkdir",
 ]
 
 [[package]]
