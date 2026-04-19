@@ -21,6 +21,7 @@ impl ProviderAgent {
                     .agent(&llm_config.model)
                     .preamble(&llm_config.system_instruction)
                     .temperature(llm_config.temperature)
+                    .default_max_turns(10)
                     .additional_params(serde_json::json!({
                         "think": llm_config.think,
                     }));
