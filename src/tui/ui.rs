@@ -113,11 +113,24 @@ fn render_chat_history(f: &mut Frame, app: &App, area: Rect) {
         text_lines.push(Line::from(""));
     }
 
-    let paragraph = Paragraph::new(Text::from(text_lines))
+    let content_width = area.width.saturating_sub(2) as usize;
+    let text = Text::from(text_lines);
+    let total_lines = wrap_line_count(&text, content_width);
+    let paragraph = Paragraph::new(text)
         .block(Block::default().borders(Borders::ALL))
         .wrap(Wrap { trim: false });
 
-    f.render_widget(paragraph, area);
+    let visible_height = area.height.saturating_sub(2);
+
+    let scroll = if app.auto_scroll() {
+        total_lines.saturating_sub(visible_height as usize)
+    } else {
+        total_lines
+            .saturating_sub(visible_height as usize)
+            .saturating_sub(app.scroll_offset() as usize)
+    };
+
+    f.render_widget(paragraph.scroll((scroll as u16, 0)), area);
 }
 
 fn render_input_box(f: &mut Frame, app: &App, area: Rect) {
@@ -141,4 +154,21 @@ fn render_input_box(f: &mut Frame, app: &App, area: Rect) {
             area.y + 1,
         ));
     }
+}
+
+fn wrap_line_count(text: &Text, max_width: usize) -> usize {
+    if max_width == 0 {
+        return text.lines.len();
+    }
+    text.lines
+        .iter()
+        .map(|line| {
+            let line_width = line.width();
+            if line_width == 0 {
+                1
+            } else {
+                (line_width + max_width - 1) / max_width
+            }
+        })
+        .sum()
 }

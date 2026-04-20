@@ -14,10 +14,12 @@ use super::ui::render_app;
 pub struct App {
     pub messages: Vec<Message>,
     pub input: InputBox,
-    pub scroll: usize,
     pub mode: AppMode,
     pub is_thinking: bool,
     pub active_tool: Option<ToolExecution>,
+
+    scroll_offset: u16,
+    auto_scroll: bool,
 
     event_rx: mpsc::Receiver<AppEvent>,
     agent_tx: mpsc::Sender<AgentCommand>,
@@ -82,8 +84,9 @@ impl App {
         App {
             messages: Vec::new(),
             input: InputBox::new(),
-            scroll: 0,
             mode: AppMode::Normal,
+            scroll_offset: 0,
+            auto_scroll: true,
             event_rx,
             agent_tx,
             is_thinking: false,
@@ -140,10 +143,18 @@ impl App {
                     self.should_exit = true;
                 }
                 KeyCode::Char('j') | KeyCode::Down => {
-                    self.scroll = self.scroll.saturating_add(1);
+                    self.scroll_offset = self.scroll_offset.saturating_sub(1);
                 }
                 KeyCode::Char('k') | KeyCode::Up => {
-                    self.scroll = self.scroll.saturating_sub(1);
+                    self.scroll_offset = self.scroll_offset.saturating_add(1);
+                    self.auto_scroll = false;
+                }
+                KeyCode::PageDown => {
+                    self.scroll_offset = self.scroll_offset.saturating_sub(10);
+                }
+                KeyCode::PageUp => {
+                    self.scroll_offset = self.scroll_offset.saturating_add(10);
+                    self.auto_scroll = false;
                 }
                 _ => {}
             },
@@ -193,6 +204,8 @@ impl App {
                 if let Some(Message::Assistant { content, .. }) = self.messages.last_mut() {
                     content.push_str(&chunk);
                 }
+                self.auto_scroll = true;
+                self.scroll_offset = 0;
             }
             AppEvent::ToolStart { name, args } => {
                 self.active_tool = Some(ToolExecution {
@@ -261,6 +274,15 @@ impl App {
         });
 
         self.mode = AppMode::Normal;
-        self.scroll = self.messages.len();
+        self.auto_scroll = true;
+        self.scroll_offset = 0;
+    }
+
+    pub fn scroll_offset(&self) -> u16 {
+        self.scroll_offset
+    }
+
+    pub fn auto_scroll(&self) -> bool {
+        self.auto_scroll
     }
 }
