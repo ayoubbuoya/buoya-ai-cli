@@ -18,7 +18,6 @@ impl LLMAgent {
     }
 
     pub async fn prompt(&self, prompt: &str) -> Result<String> {
-        println!("LLMAgent::prompt()");
         self.agent.prompt(prompt).await
     }
 }

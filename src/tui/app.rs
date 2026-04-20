@@ -122,12 +122,19 @@ impl App {
     }
 
     fn handle_key(&mut self, key: crossterm::event::KeyEvent) {
-        use crossterm::event::{KeyCode, KeyModifiers};
+        use crossterm::event::{KeyCode, KeyEventKind, KeyModifiers};
+
+        if key.kind != KeyEventKind::Press {
+            return;
+        }
 
         match self.mode {
             AppMode::Normal => match key.code {
                 KeyCode::Char('i') => self.mode = AppMode::Input,
-                KeyCode::Char('q') | KeyCode::Char('c')
+                KeyCode::Char('q') => {
+                    self.should_exit = true;
+                }
+                KeyCode::Char('c')
                     if key.modifiers.contains(KeyModifiers::CONTROL) =>
                 {
                     self.should_exit = true;
